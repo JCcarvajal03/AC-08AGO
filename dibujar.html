@@ -4,42 +4,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editor de Canvas</title>
+    
+    <!-- Agregado: Enlace a Google Fonts para una fuente más moderna -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* Cambiado: Se actualizó la fuente a 'Roboto' y se cambió el color de fondo y del texto */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif; /* Fuente moderna */
             margin: 20px;
             padding: 0;
-            /* para cambiar el color del fondo */
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 0;
-            color: white; /* Color del texto */
-            background-color: #0d0d0d; /* Negro claro para el fondo de la página */
+            color: white;
+            background-color: #1e1e1e; /* Negro claro para el fondo de la página */
         }
-        #controls {
-            margin-bottom: 25px;
-        }
-        canvas {
         
-            border: 1px solid black;
-            display: block;
-            margin: 0 auto;
-            /* para cambair el color */
-            border: 1px solid #3f3f3f;
-            display: block;
-            margin: 0 auto;
-            background-color: #111010; /* Negro más oscuro para el fondo del canvas */
+        /* Cambiado: Se añadió flexbox para organizar los controles y se espació entre ellos */
+        #controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px; /* Espacio entre controles */
+            margin-bottom: 30px;
+            text-align: center;
         }
-        .selected {
-            border: 2px solid rgb(250, 7, 7);
+        
+        /* Cambiado: Se eliminó el borde y se añadieron bordes redondeados, un fondo más oscuro y una sombra al canvas */
+        canvas {
+            border: none;
+            display: block;
+            margin: 0 auto;
+            background-color: #0d0d0d; /* Negro más oscuro para el fondo del canvas */
+            border-radius: 28px; /* Bordes redondeados */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Sombra en el canvas */
+        }
+        
+        /* Cambiado: Se mejoró la apariencia de los botones y el selector de formas con bordes redondeados, sombras y transiciones */
+        button, select {
+            background-color: #333333;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius:20px; /* Bordes redondeados */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombras suaves */
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        
+        /* Cambiado: Se añadió un efecto de elevación al pasar el mouse sobre los botones */
+        button:hover, select:hover {
+            background-color: #555555;
+            transform: translateY(-2px); /* Efecto de elevación al pasar el mouse */
+        }
+        
+        /* Cambiado: Se hizo la letra de las etiquetas un poco más gruesa */
+        label {
+            font-weight: 500; /* Letra un poco más gruesa */
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
     <div id="controls">
-        // Agregar un Selector de Color
         <label for="color">Selecciona un color:</label>
-<input type="color" id="color" value="#0064ff">
+        <input type="color" id="color" value="#ffffff">
         <label for="shape">Selecciona una forma:</label>
         <select id="shape">
             <option value="rectangle">Rectángulo</option>
@@ -49,64 +76,68 @@
     </div>
     <canvas id="canvas" width="800" height="600"></canvas>
     <script>
-		// Obtener referencias a los elementos
-		const canvas = document.getElementById('canvas');
-		const ctx = canvas.getContext('2d');
-        //para poder selecionar el color
-		const shapeSelect = document.getElementById('shape');
-        //para limpiar con el boton
-		const clearButton = document.getElementById('clear');
-       // Obtener Referencia al Selector de Color
+        // Obtener referencias a los elementos
+        /* obtenerreferncia a los elementos*/
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        /*para poder seleccionar el color*/
+        const shapeSelect = document.getElementById('shape');
+        /* para limpiar el boton */
+        const clearButton = document.getElementById('clear');
+        /*para obtener referencia del color */
+
         const colorPicker = document.getElementById('color');
 
-		let currentShape = 'rectangle';
-		let shapes = [];
-		let selectedShapeIndex = null;
+        let currentShape = 'rectangle';
+        let shapes = [];
+        let selectedShapeIndex = null;
 
-		// Manejar la selección de formas
-		shapeSelect.addEventListener('change', (e) => {
-			currentShape = e.target.value;
-		});
+        // Manejar la selección de formas
+        shapeSelect.addEventListener('change', (e) => {
+            currentShape = e.target.value;
+        });
 
-		// Manejar el clic en el canvas para dibujar formas
-		canvas.addEventListener('click', (e) => {
-			const rect = canvas.getBoundingClientRect();
-			const x = e.clientX - rect.left;
-			const y = e.clientY - rect.top;
+        // Manejar el clic en el canvas para dibujar formas
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
 
-			let shape;
-			if (currentShape === 'rectangle') {
-				shape = { type: 'rectangle', x, y, width: 100, height: 50 };
-			} else if (currentShape === 'circle') {
-				shape = { type: 'circle', x, y, radius: 50 };
-			}
-			shapes.push(shape);
-			drawShapes();
-		});
+            let shape;
+            if (currentShape === 'rectangle') {
+                shape = { type: 'rectangle', x, y, width: 100, height: 50 };
+            } else if (currentShape === 'circle') {
+                shape = { type: 'circle', x, y, radius: 50 };
+            }
+            shapes.push(shape);
+            drawShapes();
+        });
 
-		// Función para dibujar todas las formas en el canvas
-		function drawShapes() {
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			shapes.forEach((shape, index) => {
-				ctx.beginPath();
-				if (shape.type === 'rectangle') {
-					ctx.rect(shape.x, shape.y, shape.width, shape.height);
-				} else if (shape.type === 'circle') {
-					ctx.arc(shape.x, shape.y, shape.radius, 0, Math.PI * 2);
-				}
-				ctx.stroke();
-				ctx.fillStyle = colorPicker.value;
-				ctx.fill();
-				ctx.strokeStyle = 'black';
-				ctx.stroke();
-			});
-		}
+        // Función para dibujar todas las formas en el canvas
+        function drawShapes() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            shapes.forEach((shape, index) => {
+                ctx.beginPath();
+                ctx.globalAlpha = 0.8; /* Suavizar la opacidad */
+                if (shape.type === 'rectangle') {
+                    ctx.rect(shape.x, shape.y, shape.width, shape.height);
+                } else if (shape.type === 'circle') {
+                    ctx.arc(shape.x, shape.y, shape.radius, 0, Math.PI * 2);
+                }
+                ctx.fillStyle = colorPicker.value;
+                ctx.fill();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2; /* Líneas más delgadas */
+                ctx.stroke();
+            });
+            ctx.globalAlpha = 1.0; /* Restablecer la opacidad */
+        }
 
-		// Manejar el botón de limpiar
-		clearButton.addEventListener('click', () => {
-			shapes = [];
-			drawShapes();
-		});
+        // Manejar el botón de limpiar
+        clearButton.addEventListener('click', () => {
+            shapes = [];
+            drawShapes();
+        });
     </script>
 </body>
 </html>
